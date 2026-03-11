@@ -35,7 +35,7 @@ let isDragging = false;
 let startX = 0;
 let startY = 0;
 
-// update transform (pan + zoom)
+// apply transform
 function updateTransform(){
 mapWrapper.style.transform =
 `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
@@ -59,30 +59,18 @@ y: (1 - latRatio) * 100
 
 }
 
-// zoom buttons
+// ZOOM BUTTONS
 document.getElementById("zoomIn").onclick = () => {
-
-zoomLevel += 0.2;
+zoomLevel = Math.min(5, zoomLevel + 0.2);
 updateTransform();
-
 };
 
 document.getElementById("zoomOut").onclick = () => {
-
 zoomLevel = Math.max(0.4, zoomLevel - 0.2);
 updateTransform();
-
 };
 
-// adjust pan so cursor stays on same map point
-panX = mouseX - worldX * zoomLevel;
-panY = mouseY - worldY * zoomLevel;
-
-updateTransform();
-
-});
-
-// search for city
+// SEARCH CITY
 document.getElementById("searchButton").onclick = () => {
 
 const cityName =
@@ -97,10 +85,8 @@ const city = swedishCities[cityName];
 
 const pos = latLngToPercent(city.lat, city.lng);
 
-// remove old markers
 markerLayer.innerHTML = "";
 
-// create marker
 const marker = document.createElement("div");
 marker.className = "marker";
 
@@ -109,7 +95,6 @@ marker.style.top = pos.y + "%";
 
 markerLayer.appendChild(marker);
 
-// show info
 document.getElementById("cityInfo").innerHTML = `
 
 <h2>${cityName}</h2>
@@ -119,7 +104,7 @@ document.getElementById("cityInfo").innerHTML = `
 
 };
 
-// start dragging
+// DRAG PANNING
 mapWrapper.addEventListener("mousedown", e => {
 
 e.preventDefault();
@@ -132,7 +117,6 @@ startY = e.clientY - panY;
 
 });
 
-// drag movement
 document.addEventListener("mousemove", e => {
 
 if(!isDragging) return;
@@ -144,7 +128,6 @@ updateTransform();
 
 });
 
-// stop dragging
 document.addEventListener("mouseup", () => {
 
 isDragging = false;
@@ -152,4 +135,30 @@ mapWrapper.classList.remove("dragging");
 
 });
 
+// MOUSE WHEEL ZOOM (cursor centered)
+mapWrapper.addEventListener("wheel", e => {
 
+e.preventDefault();
+
+const zoomSpeed = 0.1;
+
+const rect = mapWrapper.getBoundingClientRect();
+
+const mouseX = e.clientX - rect.left;
+const mouseY = e.clientY - rect.top;
+
+const worldX = (mouseX - panX) / zoomLevel;
+const worldY = (mouseY - panY) / zoomLevel;
+
+if(e.deltaY < 0){
+zoomLevel = Math.min(5, zoomLevel + zoomSpeed);
+}else{
+zoomLevel = Math.max(0.4, zoomLevel - zoomSpeed);
+}
+
+panX = mouseX - worldX * zoomLevel;
+panY = mouseY - worldY * zoomLevel;
+
+updateTransform();
+
+});
