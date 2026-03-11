@@ -40,10 +40,6 @@ document.getElementById('searchButton').addEventListener('click', () => {
         // Calculate position on the image
         const { x, y } = latLngToImagePosition(city.lat, city.lng, imgWidth, imgHeight);
 
-        // Remove previous markers
-        const markers = document.querySelectorAll('.marker');
-        markers.forEach(marker => marker.remove());
-
         // Create a marker
         const marker = document.createElement('div');
         marker.className = 'marker';
@@ -63,5 +59,6 @@ document.getElementById('searchButton').addEventListener('click', () => {
         alert("City not found. Please try another Swedish city.");
     }
 });
+
 
 
