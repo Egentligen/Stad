@@ -20,17 +20,19 @@ const swedishCities = {
     "Norrköping": { lat: 58.5847, lng: 16.1827, population: 98396 }
 };
 
-// Store the original image dimensions
+// Store the original image dimensions and container dimensions
 let originalImgWidth = 0;
 let originalImgHeight = 0;
+let containerWidth = 0;
+let containerHeight = 0;
 
 // Convert coordinates to image positions
 function latLngToImagePosition(lat, lng) {
     const latRatio = (lat - swedenBoundingBox.minLat) / (swedenBoundingBox.maxLat - swedenBoundingBox.minLat);
     const lngRatio = (lng - swedenBoundingBox.minLng) / (swedenBoundingBox.maxLng - swedenBoundingBox.minLng);
     const yRatio = 1 - latRatio;
-    const x = lngRatio * originalImgWidth;
-    const y = yRatio * originalImgHeight;
+    const x = lngRatio * containerWidth;
+    const y = yRatio * containerHeight;
     return { x, y };
 }
 
@@ -39,35 +41,25 @@ let zoomLevel = 1;
 const mapImage = document.getElementById('swedenMap');
 const imageBox = document.querySelector('.image-box');
 
-// Initialize the map and store original dimensions
+// Initialize the map and store dimensions
 window.addEventListener('load', () => {
+    containerWidth = imageBox.clientWidth;
+    containerHeight = imageBox.clientHeight;
     originalImgWidth = mapImage.naturalWidth;
     originalImgHeight = mapImage.naturalHeight;
 });
 
+// Zoom in
 document.getElementById('zoomIn').addEventListener('click', () => {
     zoomLevel += 0.2;
     mapImage.style.transform = `scale(${zoomLevel})`;
-    updateMarkers();
 });
 
+// Zoom out
 document.getElementById('zoomOut').addEventListener('click', () => {
     zoomLevel = Math.max(0.2, zoomLevel - 0.2);
     mapImage.style.transform = `scale(${zoomLevel})`;
-    updateMarkers();
 });
-
-// Recalculate marker positions after zooming
-function updateMarkers() {
-    const markers = document.querySelectorAll('.marker');
-    markers.forEach(marker => {
-        const cityName = marker.title.split(' ')[0];
-        const city = swedishCities[cityName];
-        const { x, y } = latLngToImagePosition(city.lat, city.lng);
-        marker.style.left = `${x / zoomLevel}px`;
-        marker.style.top = `${y / zoomLevel}px`;
-    });
-}
 
 // Search button event listener
 document.getElementById('searchButton').addEventListener('click', () => {
@@ -83,8 +75,9 @@ document.getElementById('searchButton').addEventListener('click', () => {
         // Create a marker
         const marker = document.createElement('div');
         marker.className = 'marker';
-        marker.style.left = `${x / zoomLevel}px`;
-        marker.style.top = `${y / zoomLevel}px`;
+        marker.style.left = `${x}px`;
+        marker.style.top = `${y}px`;
+        marker.style.transform = `scale(${1 / zoomLevel})`;
         marker.title = `${cityName} (Population: ${city.population})`;
         imageBox.appendChild(marker);
 
