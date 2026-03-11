@@ -1,5 +1,5 @@
 // Sweden bounding box
-const swedenBoundingBox = {
+const swedenBoundingBox={
 minLat:55,
 minLng:11,
 maxLat:69,
@@ -7,7 +7,7 @@ maxLng:24
 };
 
 // Cities
-const swedishCities = {
+const swedishCities={
 Stockholm:{lat:59.3293,lng:18.0686,population:1634299},
 Gothenburg:{lat:57.7089,lng:11.9746,population:607882},
 Malmö:{lat:55.6049,lng:13.0038,population:358474},
@@ -20,70 +20,75 @@ Jönköping:{lat:57.7815,lng:14.1562,population:100208},
 Norrköping:{lat:58.5847,lng:16.1827,population:98396}
 };
 
-const markerLayer = document.getElementById("markerLayer");
-const mapWrapper = document.getElementById("mapWrapper");
+const markerLayer=document.getElementById("markerLayer");
+const mapWrapper=document.getElementById("mapWrapper");
 
-let zoomLevel = 1;
+let zoomLevel=1;
+let panX=0;
+let panY=0;
 
-// Convert lat/lng to percent position
+let isDragging=false;
+let startX=0;
+let startY=0;
+
+// apply transform
+function updateTransform(){
+mapWrapper.style.transform=
+`translate(${panX}px,${panY}px) scale(${zoomLevel})`;
+}
+
+// convert coordinates
 function latLngToPercent(lat,lng){
 
-const latRatio = (lat - swedenBoundingBox.minLat) /
-(swedenBoundingBox.maxLat - swedenBoundingBox.minLat);
+const latRatio=(lat-swedenBoundingBox.minLat)/
+(swedenBoundingBox.maxLat-swedenBoundingBox.minLat);
 
-const lngRatio = (lng - swedenBoundingBox.minLng) /
-(swedenBoundingBox.maxLng - swedenBoundingBox.minLng);
+const lngRatio=(lng-swedenBoundingBox.minLng)/
+(swedenBoundingBox.maxLng-swedenBoundingBox.minLng);
 
-return {
-x: lngRatio * 100,
-y: (1 - latRatio) * 100
+return{
+x:lngRatio*100,
+y:(1-latRatio)*100
 };
 
 }
 
-// Zoom
-document.getElementById("zoomIn").onclick = () => {
-
-zoomLevel += 0.2;
-mapWrapper.style.transform = `scale(${zoomLevel})`;
-
+// zoom buttons
+document.getElementById("zoomIn").onclick=()=>{
+zoomLevel+=0.2;
+updateTransform();
 };
 
-document.getElementById("zoomOut").onclick = () => {
-
-zoomLevel = Math.max(0.4, zoomLevel - 0.2);
-mapWrapper.style.transform = `scale(${zoomLevel})`;
-
+document.getElementById("zoomOut").onclick=()=>{
+zoomLevel=Math.max(.4,zoomLevel-.2);
+updateTransform();
 };
 
-// Search
-document.getElementById("searchButton").onclick = () => {
+// SEARCH
+document.getElementById("searchButton").onclick=()=>{
 
-const cityName = document.getElementById("cityInput").value.trim();
+const cityName=document.getElementById("cityInput").value.trim();
 
 if(!swedishCities[cityName]){
 alert("City not found");
 return;
 }
 
-const city = swedishCities[cityName];
+const city=swedishCities[cityName];
 
-const pos = latLngToPercent(city.lat, city.lng);
+const pos=latLngToPercent(city.lat,city.lng);
 
-// clear old marker
-markerLayer.innerHTML = "";
+markerLayer.innerHTML="";
 
-// create marker
-const marker = document.createElement("div");
-marker.className = "marker";
+const marker=document.createElement("div");
+marker.className="marker";
 
-marker.style.left = pos.x + "%";
-marker.style.top = pos.y + "%";
+marker.style.left=pos.x+"%";
+marker.style.top=pos.y+"%";
 
 markerLayer.appendChild(marker);
 
-// show info
-document.getElementById("cityInfo").innerHTML = `
+document.getElementById("cityInfo").innerHTML=`
 
 <h2>${cityName}</h2>
 <p><strong>Population:</strong> ${city.population}</p>
@@ -91,3 +96,33 @@ document.getElementById("cityInfo").innerHTML = `
 `;
 
 };
+
+// PAN DRAGGING
+
+mapWrapper.addEventListener("mousedown",(e)=>{
+
+isDragging=true;
+mapWrapper.classList.add("dragging");
+
+startX=e.clientX-panX;
+startY=e.clientY-panY;
+
+});
+
+document.addEventListener("mousemove",(e)=>{
+
+if(!isDragging) return;
+
+panX=e.clientX-startX;
+panY=e.clientY-startY;
+
+updateTransform();
+
+});
+
+document.addEventListener("mouseup",()=>{
+
+isDragging=false;
+mapWrapper.classList.remove("dragging");
+
+});
