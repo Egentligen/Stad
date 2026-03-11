@@ -20,13 +20,17 @@ const swedishCities = {
     "Norrköping": { lat: 58.5847, lng: 16.1827, population: 98396 }
 };
 
+// Store the original image dimensions
+let originalImgWidth = 0;
+let originalImgHeight = 0;
+
 // Convert coordinates to image positions
-function latLngToImagePosition(lat, lng, imgWidth, imgHeight) {
+function latLngToImagePosition(lat, lng) {
     const latRatio = (lat - swedenBoundingBox.minLat) / (swedenBoundingBox.maxLat - swedenBoundingBox.minLat);
     const lngRatio = (lng - swedenBoundingBox.minLng) / (swedenBoundingBox.maxLng - swedenBoundingBox.minLng);
     const yRatio = 1 - latRatio;
-    const x = lngRatio * imgWidth;
-    const y = yRatio * imgHeight;
+    const x = lngRatio * originalImgWidth;
+    const y = yRatio * originalImgHeight;
     return { x, y };
 }
 
@@ -35,24 +39,42 @@ let zoomLevel = 1;
 const mapImage = document.getElementById('swedenMap');
 const imageBox = document.querySelector('.image-box');
 
+// Initialize the map and store original dimensions
+window.addEventListener('load', () => {
+    originalImgWidth = mapImage.naturalWidth;
+    originalImgHeight = mapImage.naturalHeight;
+});
+
 document.getElementById('zoomIn').addEventListener('click', () => {
     zoomLevel += 0.2;
     mapImage.style.transform = `scale(${zoomLevel})`;
+    updateMarkers();
 });
 
 document.getElementById('zoomOut').addEventListener('click', () => {
     zoomLevel = Math.max(0.2, zoomLevel - 0.2);
     mapImage.style.transform = `scale(${zoomLevel})`;
+    updateMarkers();
 });
+
+// Recalculate marker positions after zooming
+function updateMarkers() {
+    const markers = document.querySelectorAll('.marker');
+    markers.forEach(marker => {
+        const cityName = marker.title.split(' ')[0];
+        const city = swedishCities[cityName];
+        const { x, y } = latLngToImagePosition(city.lat, city.lng);
+        marker.style.left = `${x / zoomLevel}px`;
+        marker.style.top = `${y / zoomLevel}px`;
+    });
+}
 
 // Search button event listener
 document.getElementById('searchButton').addEventListener('click', () => {
     const cityName = document.getElementById('cityInput').value.trim();
     if (cityName && swedishCities[cityName]) {
         const city = swedishCities[cityName];
-        const imgWidth = mapImage.offsetWidth * zoomLevel;
-        const imgHeight = mapImage.offsetHeight * zoomLevel;
-        const { x, y } = latLngToImagePosition(city.lat, city.lng, imgWidth, imgHeight);
+        const { x, y } = latLngToImagePosition(city.lat, city.lng);
 
         // Remove previous markers
         const markers = document.querySelectorAll('.marker');
