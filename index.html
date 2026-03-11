@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<div id="map" style="height:500px"></div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titel</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is my first webpage created with VS Code.</p>
 
-<script>
-var map = L.map('map').setView([62, 15], 5);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-}).addTo(map);
-</script>
-
-
+    <!-- Add a text input field -->
+    <label for="textInput">Enter your text:</label>
+    <input type="text" id="textInput" placeholder="Type something...">
+</body>
+</html>
