@@ -1,8 +1,12 @@
 body{
-font-family:Arial,sans-serif;
+font-family:Arial, sans-serif;
 margin:0;
 padding:20px;
 text-align:center;
+}
+
+h1{
+margin-bottom:20px;
 }
 
 .input-container{
@@ -20,7 +24,7 @@ border-radius:4px;
 
 #searchButton{
 padding:10px 20px;
-background:#007BFF;
+background-color:#007BFF;
 color:white;
 border:none;
 border-radius:4px;
@@ -28,38 +32,55 @@ cursor:pointer;
 margin-left:10px;
 }
 
+#searchButton:hover
+
 .map-container{
 position:relative;
+width:100%;
 max-width:800px;
-margin:auto;
+margin:0 auto;
 border:1px solid #ccc;
 border-radius:4px;
 overflow:hidden;
 }
 
 .image-box{
+width:100%;
 height:500px;
-display:flex;
-justify-content:center;
-align-items:center;
 overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#f5f5f5;
 }
 
+/* Map wrapper (this is what zooms and pans) */
 #mapWrapper{
 position:relative;
 width:100%;
 height:100%;
 transform-origin:center;
-transition:transform .25s ease;
+cursor:grab;
 }
 
+/* Cursor while dragging */
+#mapWrapper.dragging{
+cursor:grabbing;
+}
+
+/* Map image */
 #swedenMap{
 width:100%;
 height:100%;
 object-fit:contain;
 display:block;
+
+/* prevent browser image dragging */
+user-select:none;
+pointer-events:none;
 }
 
+/* Layer that holds markers */
 #markerLayer{
 position:absolute;
 top:0;
@@ -68,6 +89,7 @@ width:100%;
 height:100%;
 }
 
+/* City marker */
 .marker{
 position:absolute;
 width:18px;
@@ -78,6 +100,7 @@ border:2px solid white;
 transform:translate(-50%,-50%);
 }
 
+/* Zoom buttons */
 .zoom-controls{
 position:absolute;
 top:10px;
@@ -90,9 +113,13 @@ flex-direction:column;
 .zoom-controls button{
 padding:6px 10px;
 margin:2px;
+background:#f0f0f0;
+border:1px solid #ccc;
+border-radius:3px;
 cursor:pointer;
 }
 
+/* City info box */
 #cityInfo{
 margin-top:20px;
 padding:10px;
@@ -100,19 +127,6 @@ border:1px solid #ccc;
 border-radius:4px;
 background:#f9f9f9;
 max-width:500px;
-margin:auto;
+margin-left:auto;
+margin-right:auto;
 }
-
-#mapWrapper{
-position:relative;
-width:100%;
-height:100%;
-transform-origin:center;
-transition:transform .1s ease;
-cursor:grab;
-}
-
-#mapWrapper.dragging{
-cursor:grabbing;
-}
-
