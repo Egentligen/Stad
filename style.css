@@ -82,9 +82,11 @@ margin-left:10px;
 }
 
 #stats {
-  margin-top: 15px;
-  color: white;
-  font-weight: bold;
+    margin-top: 20px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
 }
 
 .zoom-controls{ 
@@ -100,17 +102,6 @@ margin-left:10px;
   margin: 2px; 
   padding: 6px 10px; 
   cursor: pointer; 
-}
-
-#cityInfo{
-margin-top:20px;
-padding:10px;
-border:1px solid #ccc;
-border-radius:4px;
-background:#f9f9f9;
-max-width:500px;
-margin-left:auto;
-margin-right:auto;
 }
 
 
