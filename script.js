@@ -140,10 +140,10 @@ function showMarker(city) {
     const marker = document.createElement("div");
     marker.className = "marker";
 
-    // Scale marker by population (normalize between 10px and 50px)
+    // Scale marker by population
     const minSize = 2, maxSize = 50;
-    const minPop = 500;   // adjust based on your dataset
-    const maxPop = 2454821; // adjust based on your dataset
+    const minPop = 500;
+    const maxPop = 800000;
     let size = ((city.population - minPop) / (maxPop - minPop)) * (maxSize - minSize) + minSize;
     size = Math.max(minSize, Math.min(size, maxSize));
     marker.style.width = size + "px";
