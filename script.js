@@ -70,9 +70,20 @@ function latLngToImagePosition(lat, lng) {
     };
 }
 
+function updateMarkers() {
+    document.querySelectorAll(".marker").forEach(marker => {
+        const lat = parseFloat(marker.dataset.lat);
+        const lng = parseFloat(marker.dataset.lng);
+        const pos = latLngToImagePosition(lat, lng);
+        marker.style.left = pos.x * zoomLevel + panX + "px";
+        marker.style.top  = pos.y * zoomLevel + panY + "px";
+    });
+}
+
 // Update zoom and pan
 function updateTransform() {
     mapWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+    updateMarkers(); // keep markers in sync
 }
 
 // Zoom buttons
