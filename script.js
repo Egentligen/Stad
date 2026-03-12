@@ -144,8 +144,7 @@ function showMarker(lat, lng, cityName, population) {
 // Search city using GeoNames
 async function searchCity(cityName) {
 
-    const url =
-        `https://secure.geonames.org/searchJSON?q=${cityName}&maxRows=1&username=stad1`;
+    const url = `http://api.geonames.org/searchJSON?q=${cityName}&maxRows=1&country=SE&username=stad1`;
 
     try {
 
