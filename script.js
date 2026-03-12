@@ -147,19 +147,17 @@ function clearMarkers() {
 
 // Place marker
 function showMarker(lat, lng, cityName, population) {
-
     clearMarkers();
 
     const pos = latLngToImagePosition(lat, lng);
 
     const marker = document.createElement("div");
-
     marker.className = "marker";
-
     marker.style.left = pos.x + "px";
     marker.style.top = pos.y + "px";
 
-    imageBox.appendChild(marker);
+    // Append to markerLayer instead of imageBox
+    document.getElementById("markerLayer").appendChild(marker);
 
     document.getElementById("cityInfo").innerHTML = `
         <h2>${cityName}</h2>
