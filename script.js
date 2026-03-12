@@ -131,7 +131,8 @@ function showMarker(lat, lng, cityName, population) {
     marker.style.left = pos.x + "px";
     marker.style.top = pos.y + "px";
 
-    imageBox.appendChild(marker);
+    // Append marker to mapWrapper, not imageBox
+    mapWrapper.appendChild(marker);
 
     cityInfo.innerHTML = `
         <h2>${cityName}</h2>
