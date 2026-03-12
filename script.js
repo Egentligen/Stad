@@ -141,15 +141,22 @@ function showMarker(lat, lng, cityName, population) {
     `;
 }
 
+// Search city using GeoNames on GitHub Pages (via CORS proxy)
 async function searchCity(cityName) {
     if (!cityName) return;
 
-    // GeoNames API via CORS proxy
-    const url = `https://cors-anywhere.herokuapp.com/http://api.geonames.org/searchJSON?q=${encodeURIComponent(cityName)}&maxRows=1&country=SE&username=stad1`;
+    // GeoNames API URL
+    const geonamesUrl = `https://cors-anywhere.herokuapp.com/http://api.geonames.org/searchJSON?q=${encodeURIComponent(cityName)}&maxRows=1&country=SE&username=stad1`;
+
+    // Use AllOrigins proxy to bypass CORS
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(geonamesUrl)}`;
 
     try {
-        const response = await fetch(url);
-        const data = await response.json();
+        const response = await fetch(proxyUrl);
+        const proxyData = await response.json();
+
+        // GeoNames data is inside proxyData.contents as a string
+        const data = JSON.parse(proxyData.contents);
 
         if (!data.geonames || data.geonames.length === 0) {
             alert("City not found in Sweden");
