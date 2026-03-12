@@ -1,183 +1,85 @@
-// Sweden bounding box
-const swedenBoundingBox = {
-    minLat: 55.0,
-    minLng: 11.0,
-    maxLat: 69.0,
-    maxLng: 24.0
-};
-
-const mapWrapper = document.getElementById("mapWrapper");
+const swedenBoundingBox = { minLat: 55, minLng: 11, maxLat: 69, maxLng: 24 };
 const mapImage = document.getElementById("swedenMap");
-const imageBox = document.querySelector(".image-box");
+const markerLayer = document.getElementById("markerLayer");
 const cityInfo = document.getElementById("cityInfo");
-
-let zoomLevel = 1;
-let panX = 0;
-let panY = 0;
-
-let isDragging = false;
-let startX;
-let startY;
+const zoomIn = document.getElementById("zoomIn");
+const zoomOut = document.getElementById("zoomOut");
 
 let cities = [];
+let zoomLevel = 1, panX = 0, panY = 0;
+let isDragging = false, startX, startY;
 
-// ----------------------
-// Loading bar / message
-// ----------------------
+// Load city data
 async function loadCities() {
-    cityInfo.innerHTML = "<p>Loading city data...</p>";
-
-    try {
-        const response = await fetch("data/swedenCities.json");
-
-        // Optional: read as text to show progress (advanced)
-        const text = await response.text();
-
-        // Parse JSON
-        cities = JSON.parse(text);
-
-        cityInfo.innerHTML = `<p>City data loaded! (${cities.length} cities)</p>`;
-
-    } catch (error) {
-        console.error("Failed to load city dataset:", error);
-        cityInfo.innerHTML = "<p>Error loading city data.</p>";
-    }
+  const res = await fetch("data/swedenCities.json");
+  cities = await res.json();
+  cityInfo.innerHTML = `<p>Loaded ${cities.length} cities</p>`;
 }
-
 loadCities();
 
-// ----------------------
+// -------------------
 // Map interactions
-// ----------------------
+// -------------------
+const imageBox = mapImage.parentElement;
 
-// Prevent image drag
-mapImage.addEventListener("dragstart", e => e.preventDefault());
-
-// Convert lat/lng to map pixel position
-function latLngToImagePosition(lat, lng) {
-    const latRange = swedenBoundingBox.maxLat - swedenBoundingBox.minLat;
-    const lngRange = swedenBoundingBox.maxLng - swedenBoundingBox.minLng;
-
-    const xRatio = (lng - swedenBoundingBox.minLng) / lngRange;
-    const yRatio = 1 - (lat - swedenBoundingBox.minLat) / latRange;
-
-    const imgWidth = mapImage.clientWidth;
-    const imgHeight = mapImage.clientHeight;
-
-    return {
-        x: xRatio * imgWidth,
-        y: yRatio * imgHeight
-    };
-}
-
-function updateMarkers() {
-    document.querySelectorAll(".marker").forEach(marker => {
-        const lat = parseFloat(marker.dataset.lat);
-        const lng = parseFloat(marker.dataset.lng);
-        const pos = latLngToImagePosition(lat, lng);
-        marker.style.left = pos.x * zoomLevel + panX + "px";
-        marker.style.top  = pos.y * zoomLevel + panY + "px";
-    });
-}
-
-// Update zoom and pan
-function updateTransform() {
-    mapWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
-    updateMarkers(); // keep markers in sync
-}
-
-// Zoom buttons
-document.getElementById("zoomIn").addEventListener("click", () => {
-    zoomLevel += 0.2;
-    updateTransform();
-});
-document.getElementById("zoomOut").addEventListener("click", () => {
-    zoomLevel = Math.max(0.2, zoomLevel - 0.2);
-    updateTransform();
-});
-
-// Mouse wheel zoom
-mapWrapper.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    const rect = mapWrapper.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const zoomFactor = 1.1;
-
-    if (e.deltaY < 0) zoomLevel *= zoomFactor;
-    else zoomLevel /= zoomFactor;
-
-    updateTransform();
-}, { passive: false });
-
-// Drag / pan
-mapWrapper.addEventListener("mousedown", e => {
-    e.preventDefault();
-    isDragging = true;
-    startX = e.clientX - panX;
-    startY = e.clientY - panY;
+imageBox.addEventListener("mousedown", e => {
+  isDragging = true; startX = e.clientX - panX; startY = e.clientY - panY;
 });
 window.addEventListener("mousemove", e => {
-    if (!isDragging) return;
-    panX = e.clientX - startX;
-    panY = e.clientY - startY;
-    updateTransform();
+  if (!isDragging) return;
+  panX = e.clientX - startX; panY = e.clientY - startY;
+  updateTransform();
 });
 window.addEventListener("mouseup", () => { isDragging = false; });
 
-// ----------------------
-// Markers
-// ----------------------
-function clearMarkers() {
-    document.querySelectorAll(".marker").forEach(m => m.remove());
+// Zoom buttons
+zoomIn.addEventListener("click", () => { zoomLevel *= 1.2; updateTransform(); });
+zoomOut.addEventListener("click", () => { zoomLevel /= 1.2; updateTransform(); });
+
+// Update map transform
+function updateTransform() {
+  mapImage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+  markerLayer.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
 }
 
-function showMarker(lat, lng, cityName, population) {
-    // Clear old markers
-    markerLayer.innerHTML = "";
+// -------------------
+// Marker functions
+// -------------------
+function latLngToImagePosition(lat, lng) {
+  const imgWidth = mapImage.clientWidth;
+  const imgHeight = mapImage.clientHeight;
+  const latRange = swedenBoundingBox.maxLat - swedenBoundingBox.minLat;
+  const lngRange = swedenBoundingBox.maxLng - swedenBoundingBox.minLng;
 
-    const pos = latLngToImagePosition(lat, lng);
+  const xRatio = (lng - swedenBoundingBox.minLng) / lngRange;
+  const yRatio = 1 - (lat - swedenBoundingBox.minLat) / latRange;
 
-    const marker = document.createElement("div");
-    marker.className = "marker";
-
-    // Apply zoom and pan manually
-    marker.style.left = pos.x * zoomLevel + panX + "px";
-    marker.style.top  = pos.y * zoomLevel + panY + "px";
-
-    markerLayer.appendChild(marker);
-
-    cityInfo.innerHTML = `
-        <h2>${cityName}</h2>
-        <p><strong>Population:</strong> ${population}</p>
-        <p><strong>Coordinates:</strong> ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
-    `;
+  return { x: xRatio * imgWidth, y: yRatio * imgHeight };
 }
 
-// ----------------------
-// Search
-// ----------------------
-function searchCity(cityName) {
-    if (!cities.length) {
-        alert("City data still loading. Please wait...");
-        return;
-    }
+function showMarker(city) {
+  markerLayer.innerHTML = "";
+  const pos = latLngToImagePosition(city.lat, city.lng);
 
-    const city = cities.find(c =>
-        c.name.toLowerCase() === cityName.toLowerCase()
-    );
+  const marker = document.createElement("div");
+  marker.className = "marker";
+  marker.style.left = pos.x + "px";
+  marker.style.top = pos.y + "px";
+  markerLayer.appendChild(marker);
 
-    if (!city) {
-        alert("City not found");
-        return;
-    }
-
-    showMarker(city.lat, city.lng, city.name, city.population);
+  cityInfo.innerHTML = `
+    <h2>${city.name}</h2>
+    <p><strong>Population:</strong> ${city.population}</p>
+    <p><strong>Coordinates:</strong> ${city.lat.toFixed(4)}, ${city.lng.toFixed(4)}</p>
+  `;
 }
 
-// Search button
+// -------------------
+// Search city
+// -------------------
 document.getElementById("searchButton").addEventListener("click", () => {
-    const cityName = document.getElementById("cityInput").value.trim();
-    if (!cityName) return;
-    searchCity(cityName);
+  const name = document.getElementById("cityInput").value.trim().toLowerCase();
+  const city = cities.find(c => c.name.toLowerCase() === name);
+  if (!city) return alert("City not found");
+  showMarker(city);
 });

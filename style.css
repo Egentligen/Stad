@@ -35,23 +35,9 @@ margin-left:10px;
 
 #searchButton:hover
 
-.map-container{
-position:relative;
-width:100%;
-max-width:800px;
-margin:0 auto;
-border:1px solid #ccc;
-border-radius:4px;
-overflow:hidden;
-}
+.map-container { position: relative; width: 800px; max-width: 100%; margin: auto; }
 
-.image-box {
-  width: 100%;
-  height: 1100px;
-  overflow: hidden;
-  position: relative;
-  background: #1E2026;
-}
+.image-box { position: relative; overflow: hidden; width: 100%; height: 1100px; background: #1E2026; }
 
 #mapWrapper {
   position: absolute;
@@ -67,32 +53,17 @@ overflow:hidden;
   cursor: grabbing;
 }
 
-#swedenMap {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  user-select: none;
-  pointer-events: none; /* prevent stop-sign cursor */
-}
+#swedenMap { width: 100%; height: 100%; object-fit: contain; display: block; }
 
-#markerLayer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
+#markerLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 
 .marker {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 10px; height: 10px;
   background: yellow;
   border-radius: 50%;
-  border: 0.5px solid black;
+  border: 1px solid black;
   transform: translate(-50%, -50%);
-  pointer-events: none;
 }
 
 .zoom-controls{
