@@ -1,4 +1,4 @@
-const swedenBoundingBox = { minLat: 55, minLng: 11, maxLat: 69, maxLng: 24 };
+const swedenBoundingBox = { minLat: 55.1, minLng: 11.1, maxLat: 69, maxLng: 24.4 };
 
 const mapImage = document.getElementById("swedenMap");
 const markerLayer = document.getElementById("markerLayer");
