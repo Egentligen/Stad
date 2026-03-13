@@ -141,7 +141,7 @@ function showMarker(city) {
     }
 
     // Map lat/lng to image position
-    const pos = latLngToImagePosition(city.lat - 0.2, city.lng - 2);
+    const pos = latLngToImagePosition(city.lat + 0.4, city.lng - 0.8);
     const marker = document.createElement("div");
     marker.className = "marker";
 

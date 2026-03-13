@@ -81,18 +81,6 @@ margin-left:10px;
   pointer-events: none;
 }
 
-#cityInfoHover {
-    position: absolute;
-    display: none;
-    pointer-events: none;
-    background: #30343D;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 14px;
-    z-index: 100; 
-}
-
 #stats {
     margin-top: 20px;
     color: white;
